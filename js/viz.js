@@ -2,7 +2,6 @@ $(document).ready(function() {
   queue()
     .defer(d3.csv, "data/WorldWeed.csv")
     .defer(d3.json, "data/world.json")
-    .defer(d3.tsv, "data/world-country-names.tsv")
     .await(ready);
 });
 
@@ -52,7 +51,7 @@ mapsvg.append("path")
     .attr("class", "graticule outline")
     .attr("d", path);
 
-function ready(error, data, world, names) {
+function ready(error, data, world) {
     var domainByTrait = {},
         traits = d3.keys(data[0]).filter(function(d) { return d !== "name" && d !== "POP_EST" && d !== "GDP_MD_EST"; }),
         n = traits.length;
@@ -126,7 +125,6 @@ function ready(error, data, world, names) {
           .attr("cx", function(d) { return x(d[p.x]); })
           .attr("cy", function(d) { return y(d[p.y]); })
           .attr("r", 3)
-          //.style("fill", function(d) { return color(d.name); });
           .style("fill", "black");
     }
 
@@ -168,15 +166,24 @@ function ready(error, data, world, names) {
   var countries = topojson.feature(world, world.objects.countries).features,
       neighbors = topojson.neighbors(world.objects.countries.geometries);
 
-  var selectOnMap = function(countryname, color) {
-    var countryIndex = 0;
-    for (countryIndex; countryIndex < names.length; countryIndex++) {
-      
+  function alreadySelected(countryIndex) {
+    return mapsvg.selectAll(".country")[0][countryIndex].style.fill != "#808080";
+  }
+
+  var toggleSelectOnMap = function(countryname, color) {
+    var countryIndex = mapNamesToIdx[countryname];
+    if (alreadySelected(countryIndex)) {
+      mapsvg.selectAll(".country")[0][countryIndex].style.fill = "#808080";
+    } else {
+      mapsvg.selectAll(".country")[0][countryIndex].style.fill = color;
     }
   };
 
   var onMapClick = function(d, i) {
-    console.log("clicked " + names[i].name);
+    console.log("clicked " + i + " : " + mapNamesToIdx[i]);
+    toggleSelectOnMap(mapNamesToIdx[i], color(i).name);
+    //TODO: this needs to be uncommented and written!
+    //selectOnChart(names[i].name, color[d].name);
   };
 
   mapsvg.selectAll(".country")
@@ -184,6 +191,123 @@ function ready(error, data, world, names) {
     .enter().insert("path", ".graticule")
     .attr("class", "country")
     .attr("d", path)
-    .style("fill", function(d, i) { return "grey"; })
+    .style("fill", "grey")
     .on("click", onMapClick);
 }
+
+var mapNamesToIdx = {
+  Mongolia : 146,
+  146 : "Mongolia",
+  Tajikistan: 214,
+  214 : "Tajikistan",
+  Turkmenistan : 215,
+  215 : "Turkmenistan",
+  Jordan : 109,
+  109 : "Jordan",
+  Kyrgyzstan : 114,
+  114 : "Kyrgyzstan",
+  Nepal : 163,
+  163 : "Nepal",
+  Romania : 182,
+  182 : "Romania",
+  Japan : 110,
+  110 : "Japan",
+  Macedonia : 141,
+  141 : "Macedonia",
+  Ecuador : 63,
+  63 : "Ecuador",
+  Belarus : 28,
+  28 : "Belarus",
+  Nicaragua : 159,
+  159 : "Nicaragua",
+  Mexico : 139,
+  139 : "Mexico",
+  Thailand : 213,
+  213 : "Thailand",
+  Paraguay : 178,
+  178 : "Paraguay",
+  Albania : 4,
+  4 : "Albania",
+  Montenegro : 145,
+  145 : "Montenegro",
+  Lebanon : 179,
+  179 : "Lebanon",
+  Kenya : 113,
+  113 : "Kenya",
+  Hungary : 95,
+  95 : "Hungary",
+  Bulgaria : 23,
+  23 : "Bulgaria",
+  Sweden : 205,
+  205 : "Sweden",
+  Georgia : 77,
+  77 : "Georgia",
+  Ukraine : 224,
+  224 : "Ukraine",
+  Slovenia : 204,
+  204 : "Slovenia",
+  Iceland : 104,
+  104 : "Iceland",
+  Russia : 183,
+  183 : "Russia",
+  Armenia : 9,
+  9 : "Armenia",
+  Azerbaijan : 17,
+  17 : "Azerbaijan",
+  Panama : 168,
+  168 : "Panama",
+  Portugal : 177,
+  177 : "Portugal",
+  Norway : 162,
+  162 : "Norway",
+  Serbia : 200,
+  200 : "Serbia",
+  Kazakhstan : 112,
+  112 : "Kazakhstan",
+  Cyprus : 55,
+  55 : "Cyprus",
+  Finland : 69,
+  69 : "Finland",
+  Germany : 57,
+  57 : "Germany",
+  Chile : 40,
+  40 : "Chile",
+  Croatia : 26,
+  26 : "Croatia",
+  Belgium : 19,
+  19 : "Belgium",
+  Switzerland : 39,
+  39 : "Switzerland",
+  "United Arab Emirates" : 7,
+  7 : "United Arab Emirates",
+  Lithuania : 129,
+  129 : "Lithuania",
+  Estonia : 67,
+  67 : "Estonia",
+  Ireland : 101,
+  101 : "Ireland",
+  Egypt : 64,
+  64 : "Egypt",
+  Luxembourg : 130,
+  130 : "Luxembourg",
+  Slovakia : 203,
+  203 : "Slovakia",
+  "United Kingdom" : 76,
+  76 : "United Kingdom",
+  France : 72,
+  72 : "France",
+  Israel : 105,
+  105 : "Israel",
+  Spain : 66,
+  66 : "Spain",
+  Poland : 174,
+  174 : "Poland",
+  Canada : 38,
+  38 : "Canada",
+  Italy : 106,
+  106 : "Italy",
+  "New Zealand" : 165,
+  165 : "New Zealand",
+};
+
+
