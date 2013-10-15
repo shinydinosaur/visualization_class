@@ -141,18 +141,38 @@ function ready(error, data, world) {
         x.domain(domainByTrait[p.x]);
         y.domain(domainByTrait[p.y]);
         brushCell = this;
+		// colorMap(); UNCOMMENT THIS AFTER FUNCTION IS WRITTEN.
       } 
     }
 
     // Highlight the selected circles.
     function brushmove(p) {
       var e = brush.extent();
+	  var countryNames = {};
       var selectedCircles = svg.selectAll("circle").classed("hidden", function(d) {
-          return e[0][0] > d[p.x] || d[p.x] > e[1][0]
+          var hide = e[0][0] > d[p.x] || d[p.x] > e[1][0]
           || e[0][1] > d[p.y] || d[p.y] > e[1][1];
+	      if (!hide)
+		  	countryNames[d.name] = true;
+	      return hide;
       });
-      selectedCircles.style("fill", function(d) {return color(d.name); });
+	  // color the circle according to the name of the country
+	  selectedCircles.style("fill", function(d) { return color(d.name);} );
+	  // select the appropriate country on the map
+	  clearMap();
+	  for (var i = 0; i < Object.keys(countryNames).length; ++i) {
+		var countryName = Object.keys(countryNames)[i];
+		var circleColor = color(countryName);
+		selectOnMap(countryName, circleColor);
+	  }
     }
+   
+	function selectOnChart() {
+		var selectedCircles = svg.selectAll("circle").classed("hidden", function(d) {
+			return !alreadySelected(mapNamesToIdx[d.name]);
+		});
+	  	selectedCircles.style("fill", function(d) { return color(d.name);} );
+	}
 
     // If the brush is empty, select all circles.
     function brushend() {
@@ -186,11 +206,23 @@ function ready(error, data, world) {
     }
   };
 
+  // TODO: write a function that colors the whole map with all the countries in the data that we have (these are not all the colors).
+  function colorMap() {
+  }
+
+  function selectOnMap(countryName, color) {
+    var countryIndex = mapNamesToIdx[countryName];
+    mapsvg.selectAll(".country")[0][countryIndex].style.fill = color;
+  }
+
+  function clearMap() {
+  	mapsvg.selectAll(".country").style("fill", "#808080");
+  }
+
   var onMapClick = function(d, i) {
     console.log("clicked " + i + " : " + mapNamesToIdx[i]);
     toggleSelectOnMap(mapNamesToIdx[i], countryColor(i));
-    //TODO: this needs to be uncommented and written!
-    //selectOnChart(names[i].name, color[d].name);
+    selectOnChart();
   };
 
   function mapSelectAll() {
