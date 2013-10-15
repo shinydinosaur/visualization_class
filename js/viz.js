@@ -210,6 +210,13 @@ function ready(error, data, world) {
     .style("fill", "grey")
     .on("click", onMapClick);
 
+  var allCountries = mapsvg.selectAll('.country')[0];
+  for(var i = 0; i < allCountries.length; i++) {
+    if (!(i in mapNamesToIdx)) {
+      allCountries[i].style.fill = "#dadada";
+    }
+  }
+
   console.log("setup complete");
 }
 
