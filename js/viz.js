@@ -27,6 +27,10 @@ var yAxis = d3.svg.axis()
 
 var color = d3.scale.category20();
 
+function countryColor(i) {
+  return color(mapNamesToIdx[i]);
+}
+
 var mapwidth = 960,
     mapheight = 500;
 
@@ -152,7 +156,10 @@ function ready(error, data, world) {
 
     // If the brush is empty, select all circles.
     function brushend() {
-      if (brush.empty()) svg.selectAll(".hidden").classed("hidden", false);
+      if (brush.empty()) {
+        svg.selectAll(".hidden").classed("hidden", false);
+        mapSelectAll();
+      }
     }
 
     function cross(a, b) {
@@ -181,10 +188,19 @@ function ready(error, data, world) {
 
   var onMapClick = function(d, i) {
     console.log("clicked " + i + " : " + mapNamesToIdx[i]);
-    toggleSelectOnMap(mapNamesToIdx[i], color(i).name);
+    toggleSelectOnMap(mapNamesToIdx[i], countryColor(i));
     //TODO: this needs to be uncommented and written!
     //selectOnChart(names[i].name, color[d].name);
   };
+
+  function mapSelectAll() {
+    var allCountries = mapsvg.selectAll(".country")[0];
+    for(var i = 0; i < allCountries.length; i++) {
+      if(i in mapNamesToIdx) {
+        allCountries[i].style.fill = countryColor(i);
+      }
+    }
+  }
 
   mapsvg.selectAll(".country")
     .data(countries)
@@ -193,6 +209,8 @@ function ready(error, data, world) {
     .attr("d", path)
     .style("fill", "grey")
     .on("click", onMapClick);
+
+  console.log("setup complete");
 }
 
 var mapNamesToIdx = {
@@ -309,5 +327,3 @@ var mapNamesToIdx = {
   "New Zealand" : 165,
   165 : "New Zealand",
 };
-
-
