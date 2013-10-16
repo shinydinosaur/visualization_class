@@ -141,7 +141,6 @@ function ready(error, data, world) {
         x.domain(domainByTrait[p.x]);
         y.domain(domainByTrait[p.y]);
         brushCell = this;
-		// colorMap(); UNCOMMENT THIS AFTER FUNCTION IS WRITTEN.
       } 
     }
 
@@ -206,17 +205,17 @@ function ready(error, data, world) {
     }
   };
 
-  // TODO: write a function that colors the whole map with all the countries in the data that we have (these are not all the colors).
-  function colorMap() {
-  }
-
   function selectOnMap(countryName, color) {
     var countryIndex = mapNamesToIdx[countryName];
     mapsvg.selectAll(".country")[0][countryIndex].style.fill = color;
   }
 
   function clearMap() {
-  	mapsvg.selectAll(".country").style("fill", "#808080");
+    for(var i = 0; i < allCountries.length; i++) {
+      if(i in mapNamesToIdx) {
+        allCountries[i].style.fill = "#808080";
+      }
+    }
   }
 
   var onMapClick = function(d, i) {
